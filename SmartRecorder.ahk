@@ -29,6 +29,8 @@ CoordMode("Pixel", "Screen")
 SetMouseDelay(-1)
 SetKeyDelay(-1, -1)
 
+global appIconPath := A_ScriptDir . "\SmartRecorder.ico"
+
 ; ------------------------- НАСТРОЙКИ -------------------------
 global repeatCount := 1
 global playbackSpeed := 2.0
@@ -145,6 +147,8 @@ try {
     smartLastError := "OCR.ahk не найден или не загрузился"
 }
 
+ApplyAppIcon()
+
 ; ============================================================
 ; ПАНЕЛЬ СОСТОЯНИЯ
 ; ============================================================
@@ -214,102 +218,84 @@ journalGui.Show(
 global controlGui := Gui("+AlwaysOnTop", "Smart Recorder — Test Mode")
 controlGui.SetFont("s10", "Segoe UI")
 
-controlGui.Add("Text", "x15 y18 w185 h24", "Количество повторов:")
-global repeatEditCtrl := controlGui.Add("Edit", "x215 y15 w95 h25", repeatCount)
+; ------------------------------------------------------------
+; КОМПАКТНАЯ ПАНЕЛЬ НАСТРОЕК
+; ------------------------------------------------------------
 
-controlGui.Add("Text", "x15 y53 w185 h24", "Скорость воспроизведения:")
-global speedEditCtrl := controlGui.Add("Edit", "x215 y50 w95 h25", playbackSpeed)
-controlGui.Add("Text", "x315 y53 w35 h24", "x")
+; Запуск / тайминги
+controlGui.Add("GroupBox", "x10 y10 w385 h125", "Запуск и тайминги")
 
-controlGui.Add("Text", "x15 y88 w185 h24", "Кулдаун ОТ:")
-global cooldownMinEditCtrl := controlGui.Add("Edit", "x215 y85 w120 h25", FormatDurationInput(cooldownMinMinutes * 60))
+; Общая сетка верхнего блока: все строки начинаются с x25 и заканчиваются на x380.
+; Подписи выровнены по одной левой линии, правый край элементов общий.
+controlGui.Add("Text", "x25 y35 w138 h25 0x200", "Количество повторов:")
+global repeatEditCtrl := controlGui.Add("Edit", "x169 y35 w211 h25", repeatCount)
 
-controlGui.Add("Text", "x15 y123 w185 h24", "Кулдаун ДО:")
-global cooldownMaxEditCtrl := controlGui.Add("Edit", "x215 y120 w120 h25", FormatDurationInput(cooldownMaxMinutes * 60))
+; Скорость + кулдаун: одинаковые компактные отступы подпись → поле.
+controlGui.Add("Text", "x20 y70 w62 h25 Right 0x200", "Скорость:")
+global speedEditCtrl := controlGui.Add("Edit", "x87 y70 w95 h25", playbackSpeed)
 
-controlGui.Add(
-    "Text",
-    "x15 y151 w375 h22",
-    "Примеры времени: 3м | 3м 30с | 90с | 00:03:30"
-)
+controlGui.Add("Text", "x188 y70 w62 h25 Right 0x200", "Кулдаун:")
+global cooldownMinEditCtrl := controlGui.Add("Edit", "x255 y70 w54 h25", FormatDurationInput(cooldownMinMinutes * 60))
+controlGui.Add("Text", "x313 y70 w10 h25 Center 0x200", "—")
+global cooldownMaxEditCtrl := controlGui.Add("Edit", "x327 y70 w53 h25", FormatDurationInput(cooldownMaxMinutes * 60))
 
-controlGui.Add("GroupBox", "x10 y178 w385 h255", "Синтетический профиль + OCR (тестовый режим)")
+controlGui.Add("Text", "x25 y104 w54 h20 0x200", "Формат:")
+global formatHintCtrl := controlGui.Add("Text", "x82 y104 w298 h20 0x200", "3м, 3м30с, 90с, 00:03:30")
+formatHintCtrl.SetFont("s9", "Segoe UI")
 
-controlGui.Add("Text", "x25 y205 w155 h24", "Возраст ОТ:")
-global ageMinEditCtrl := controlGui.Add("Edit", "x190 y202 w85 h25", ageMin)
+; Профиль
+controlGui.Add("GroupBox", "x10 y145 w385 h195", "Профиль теста")
 
-controlGui.Add("Text", "x25 y240 w155 h24", "Возраст ДО:")
-global ageMaxEditCtrl := controlGui.Add("Edit", "x190 y237 w85 h25", ageMax)
+; Единая аккуратная сетка профиля.
+controlGui.Add("Text", "x25 y170 w52 h25 Right 0x200", "Возраст:")
+global ageMinEditCtrl := controlGui.Add("Edit", "x83 y170 w48 h25", ageMin)
+controlGui.Add("Text", "x136 y170 w16 h25 Center 0x200", "—")
+global ageMaxEditCtrl := controlGui.Add("Edit", "x157 y170 w48 h25", ageMax)
 
-controlGui.Add("Text", "x25 y275 w155 h24", "Пол:")
-global sexModeDropCtrl := controlGui.Add("DropDownList", "x190 y272 w155", ["Случайно (М/Ж)", "Мужской", "Женский", "Другое"])
+controlGui.Add("Text", "x215 y170 w28 h25 Right 0x200", "Пол:")
+global sexModeDropCtrl := controlGui.Add("DropDownList", "x248 y170 w132", ["Случайно (М/Ж)", "Мужской", "Женский"])
 sexModeDropCtrl.Choose(1)
 
-global randomProfileCheckCtrl := controlGui.Add("CheckBox", "x25 y310 w335 h25", "Новый случайный профиль перед каждым повтором")
+global randomProfileCheckCtrl := controlGui.Add("CheckBox", "x25 y203 w355 h24", "Новый случайный профиль перед каждым повтором")
 randomProfileCheckCtrl.Value := 1
 
-global currentProfileLabelCtrl := controlGui.Add("Text", "x25 y342 w345 h25", "Текущий профиль: —")
+global currentProfileLabelCtrl := controlGui.Add("Text", "x25 y232 w355 h22", "Текущий профиль: —")
 
-global smartOcrCheckCtrl := controlGui.Add("CheckBox", "x25 y372 w250 h25", "Включить OCR-распознавание (F6)")
-global ocrStateLabelCtrl := controlGui.Add("Text", "x285 y372 w95 h25", ocrAvailable ? "OCR: готов" : "OCR: нет")
+global smartOcrCheckCtrl := controlGui.Add("CheckBox", "x25 y260 w230 h24", "Включить OCR-распознавание (F6)")
+global ocrStateLabelCtrl := controlGui.Add("Text", "x295 y260 w85 h24 Right 0x200", ocrAvailable ? "OCR: готов" : "OCR: нет")
 
-global newProfileGuiBtn := controlGui.Add("Button", "x25 y400 w170 h28", "Новый профиль F5")
+global newProfileGuiBtn := controlGui.Add("Button", "x25 y293 w138 h30", "Новый профиль F5")
+controlGui.Add("Text", "x175 y293 w205 h30 0x200", "F3 — выбор пола")
+
+; Основное управление
+global recordGuiBtn := controlGui.Add("Button", "x15 y350 w120 h38", "Запись F8")
+global playGuiBtn := controlGui.Add("Button", "x145 y350 w120 h38", "Старт F9")
+global stopGuiBtn := controlGui.Add("Button", "x275 y350 w120 h38", "СТОП F10")
+
+global smartTypeGuiBtn := controlGui.Add("Button", "x15 y398 w185 h36", "Ввести подсказку F7")
+global hideGuiBtn := controlGui.Add("Button", "x210 y398 w185 h36", "Скрыть настройки")
+
 controlGui.Add(
     "Text",
-    "x205 y398 w175 h36",
-    "Для F3 наведите мышь`nв середину radio-строки."
+    "x15 y444 w380 h50",
+    "F1 — журнал | F3 — пол | F4 — ответ | F5 — профиль | F6 — OCR`nF7 — OCR-ответ | F11 — статус | F12 — настройки | Esc — выход"
 )
-
-; Кнопки
-global recordGuiBtn := controlGui.Add("Button", "x15 y445 w120 h38", "Запись F8")
-global playGuiBtn := controlGui.Add("Button", "x145 y445 w120 h38", "Старт F9")
-global stopGuiBtn := controlGui.Add("Button", "x275 y445 w120 h38", "СТОП F10")
-
-global smartTypeGuiBtn := controlGui.Add("Button", "x15 y493 w185 h38", "Ввести подсказку F7")
-global hideGuiBtn := controlGui.Add("Button", "x210 y493 w185 h38", "Скрыть настройки")
-
-controlGui.Add("Text", "x15 y543 w380 h52", "F1 — журнал | F4 — ответ по тексту | F5 — новый профиль | F6 — OCR`nF7 — OCR-ответ | F11 — статус | F12 — настройки | Esc — выход")
 
 ; ------------------------------------------------------------
-; СОХРАНЕНИЕ ЗАПИСИ МЕЖДУ СЕССИЯМИ
+; ЗАПИСИ: СОХРАНЕНИЕ АВТОМАТИЧЕСКОЕ, В GUI ТОЛЬКО ВЫБОР ФАЙЛА
 ; ------------------------------------------------------------
+controlGui.Add("GroupBox", "x10 y500 w385 h92", "Запись")
 
-controlGui.Add(
-    "GroupBox",
-    "x10 y600 w385 h155",
-    "Сохранение / загрузка записей"
-)
-
-; Первая строка — быстрые действия с текущей записью.
-global saveRecordingGuiBtn := controlGui.Add(
-    "Button",
-    "x25 y627 w165 h32",
-    "Сохранить сейчас"
-)
-
-global loadRecordingGuiBtn := controlGui.Add(
-    "Button",
-    "x205 y627 w165 h32",
-    "Перезагрузить текущую"
-)
-
-; Вторая строка — выбор отдельного файла.
-global saveAsRecordingGuiBtn := controlGui.Add(
-    "Button",
-    "x25 y669 w165 h32",
-    "Сохранить как..."
+global recordingFileLabelCtrl := controlGui.Add(
+    "Text",
+    "x25 y522 w345 h22",
+    "Текущий файл: last_recording.srm"
 )
 
 global loadOtherRecordingGuiBtn := controlGui.Add(
     "Button",
-    "x205 y669 w165 h32",
-    "Загрузить другую..."
-)
-
-global recordingFileLabelCtrl := controlGui.Add(
-    "Text",
-    "x25 y712 w345 h32",
-    "Текущий файл: last_recording.srm"
+    "x25 y550 w345 h32",
+    "Загрузить другую запись..."
 )
 
 recordGuiBtn.OnEvent("Click", StartRecordingFromGui)
@@ -317,15 +303,13 @@ playGuiBtn.OnEvent("Click", StartPlaybackFromGui)
 stopGuiBtn.OnEvent("Click", StopPlaybackFromGui)
 smartTypeGuiBtn.OnEvent("Click", TypeSmartAnswerFromGui)
 newProfileGuiBtn.OnEvent("Click", NewProfileFromGui)
-saveRecordingGuiBtn.OnEvent("Click", SaveRecordingFromGui)
-saveAsRecordingGuiBtn.OnEvent("Click", SaveRecordingAsFromGui)
-loadRecordingGuiBtn.OnEvent("Click", LoadRecordingFromGui)
 loadOtherRecordingGuiBtn.OnEvent("Click", LoadOtherRecordingFromGui)
 hideGuiBtn.OnEvent("Click", HideControlWindow)
 smartOcrCheckCtrl.OnEvent("Click", SmartCheckboxChanged)
 controlGui.OnEvent("Close", HideControlWindow)
 
-controlGui.Show("x540 y20 w410 h760")
+controlGui.Show("x540 y20 w410 h605")
+ApplyGuiIcons()
 ApplySettings()
 GenerateTestProfile(false)
 
@@ -359,6 +343,31 @@ F10::StopPlayback()
 F11::ToggleStatusPanel()
 F12::ToggleControlWindow()
 Esc::QuitScript()
+
+ApplyAppIcon() {
+    global appIconPath
+    if FileExist(appIconPath) {
+        try TraySetIcon(appIconPath)
+    }
+}
+
+ApplyGuiIcons() {
+    global appIconPath, statusGui, journalGui, controlGui
+    if !FileExist(appIconPath)
+        return
+    try SetWindowIcon(statusGui.Hwnd, appIconPath)
+    try SetWindowIcon(journalGui.Hwnd, appIconPath)
+    try SetWindowIcon(controlGui.Hwnd, appIconPath)
+}
+
+SetWindowIcon(hwnd, iconPath) {
+    hIconBig := LoadPicture(iconPath, "Icon1 w32 h32", &imgType)
+    hIconSmall := LoadPicture(iconPath, "Icon1 w16 h16", &imgType2)
+    if hIconBig
+        SendMessage(0x80, 1, hIconBig,, "ahk_id " hwnd) ; WM_SETICON, ICON_BIG
+    if hIconSmall
+        SendMessage(0x80, 0, hIconSmall,, "ahk_id " hwnd) ; WM_SETICON, ICON_SMALL
+}
 
 UnlockStatusPanel() {
     global statusPanelFrozen
@@ -2554,22 +2563,19 @@ InsertProfileSexHotkey() {
     if playing
         return
 
-    ; X запоминаем из положения мыши в момент F3.
-    ; При воспроизведении OCR определит правильную строку по Y,
-    ; а клик будет сделан по этой сохранённой X-позиции.
-    MouseGetPos(&anchorX, &anchorY)
-
+    ; F3 больше не запоминает координаты мыши.
+    ; Во время записи сохраняется только специальная команда,
+    ; а нужный radio-вариант каждый раз находится OCR-ом заново.
     if recording {
         events.Push({
             kind: "profile_sex",
-            t: A_TickCount - recordStart,
-            x: anchorX
+            t: A_TickCount - recordStart
         })
-        lastAction := "Метка профиля: пол (X=" . anchorX . ")"
-        LogEvent("F3: метка пола профиля")
+        lastAction := "Метка профиля: пол (OCR)"
+        LogEvent("F3: метка пола профиля — OCR")
     }
 
-    InsertCurrentProfileSex(anchorX)
+    InsertCurrentProfileSex()
 }
 
 InsertCurrentProfileAge() {
@@ -2583,98 +2589,237 @@ InsertCurrentProfileAge() {
     }
 }
 
-InsertCurrentProfileSex(anchorX:="") {
-    global testSex, ignoreKeyboardCapture, ocrAvailable, statusTextCtrl
+NormalizeGenderOcrText(text) {
+    text := StrLower(String(text))
+    text := StrReplace(text, "ё", "е")
 
-    ; --------------------------------------------------------
-    ; RADIO / КНОПКИ ВЫБОРА
-    ;
-    ; 1. OCR находит именно "Мужской" или "Женский".
-    ; 2. found.Click() надёжно переводит курсор на найденную строку.
-    ; 3. После этого берём фактический экранный Y курсора.
-    ; 4. Если при записи был сохранён anchorX, кликаем ещё раз
-    ;    по центру/внутри всей строки на том же Y.
-    ;
-    ; Для radio-кнопки повторный клик по уже выбранному варианту
-    ; не снимает выбор, поэтому такой двойной способ безопасен.
-    ; --------------------------------------------------------
+    ; Частые случаи, когда OCR смешивает похожие латинские
+    ; и кириллические символы в одном слове.
+    replacements := Map(
+        "a", "а",
+        "c", "с",
+        "e", "е",
+        "k", "к",
+        "m", "м",
+        "o", "о",
+        "p", "р",
+        "t", "т",
+        "x", "х",
+        "y", "у"
+    )
 
-    if ocrAvailable {
-        try {
-            overlayWasVisible := HideStatusForOcr()
+    for from, to in replacements
+        text := StrReplace(text, from, to)
 
-            try {
-                try result := OCR.FromWindow(
-                    "A",
-                    {lang:"ru-RU", scale:1.35, grayscale:true}
-                )
-                catch
-                    result := OCR.FromWindow(
-                        "A",
-                        {scale:1.35, grayscale:true}
-                    )
-            } finally {
-                RestoreStatusAfterOcr(overlayWasVisible)
-            }
+    ; Для сравнения оставляем только буквы.
+    return RegExReplace(text, "[^а-я]", "")
+}
 
-            found := result.FindString(testSex)
+GenderEditDistance(a, b) {
+    a := String(a)
+    b := String(b)
+    aLen := StrLen(a)
+    bLen := StrLen(b)
 
-            if IsObject(found) {
-                ; Сначала кликаем по распознанному тексту.
-                found.Click()
+    prev := []
+    Loop bLen + 1
+        prev.Push(A_Index - 1)
 
-                Sleep(80)
+    Loop aLen {
+        i := A_Index
+        curr := [i]
+        aChar := SubStr(a, i, 1)
 
-                ; Теперь курсор находится на нужной строке.
-                MouseGetPos(&ocrTextX, &rowY)
+        Loop bLen {
+            j := A_Index
+            cost := aChar = SubStr(b, j, 1) ? 0 : 1
+            curr.Push(Min(
+                curr[j] + 1,
+                prev[j + 1] + 1,
+                prev[j] + cost
+            ))
+        }
 
-                ; Если X был сохранён при записи F3,
-                ; используем его как точку внутри всей radio-строки.
-                if (anchorX != "") {
-                    MouseMove(anchorX, rowY, 0)
-                    Sleep(35)
-                    Click()
-                }
+        prev := curr
+    }
 
-                if (anchorX != "") {
-                    clickInfo :=
-                        "Клик по строке: X=" .
-                        anchorX .
-                        ", Y=" .
-                        rowY
-                } else {
-                    clickInfo :=
-                        "Клик по тексту варианта."
-                }
+    return prev[bLen + 1]
+}
 
-                statusTextCtrl.Text :=
-                    "✓ ПОЛ ВЫБРАН`n`n" .
-                    "Профиль: " .
-                    testSex .
-                    "`n" .
-                    "OCR нашёл нужную строку.`n" .
-                    clickInfo
+GenderCandidateScore(text, targetSex) {
+    normalized := NormalizeGenderOcrText(text)
+    target := NormalizeGenderOcrText(targetSex)
 
-                return true
-            }
-        } catch as err {
-            ; Ниже есть резервный вариант ввода текстом.
+    if normalized = "" || target = ""
+        return 0
+
+    if normalized = target
+        return 100
+
+    if InStr(normalized, target)
+        return 96
+
+    root := targetSex = "Женский" ? "жен" : "муж"
+    if InStr(normalized, root)
+        return 88
+
+    ; OCR иногда ошибается на 1–2 символа, особенно на тёмной теме.
+    ; Для отдельного короткого слова разрешаем небольшую погрешность.
+    if StrLen(normalized) >= 5 && StrLen(normalized) <= 10 {
+        distance := GenderEditDistance(normalized, target)
+        if distance <= 1
+            return 82
+        if distance <= 2
+            return 72
+    }
+
+    return 0
+}
+
+FindGenderCandidate(result, targetSex) {
+    best := ""
+    bestScore := 0
+
+    ; Сначала строки: так клик обычно приходится по центру label.
+    for line in result.Lines {
+        score := GenderCandidateScore(line.Text, targetSex)
+        if score > bestScore {
+            best := line
+            bestScore := score
         }
     }
 
-    ; --------------------------------------------------------
-    ; РЕЗЕРВНЫЙ ВАРИАНТ
-    ; Если OCR не смог найти radio-вариант, пытаемся ввести
-    ; значение в текущее активное поле как текст.
-    ; --------------------------------------------------------
+    ; Затем отдельные слова — полезно, если OCR объединил строку странно.
+    for word in result.Words {
+        score := GenderCandidateScore(word.Text, targetSex)
+        if score > bestScore {
+            best := word
+            bestScore := score
+        }
+    }
 
-    ignoreKeyboardCapture := true
+    return bestScore >= 72 ? best : ""
+}
+
+InsertCurrentProfileSex() {
+    global testSex, ocrAvailable, statusTextCtrl
+    global controlGui, controlVisible
+
+    ; Пол больше НИКОГДА не вводится как текст.
+    ; Единственный способ — распознать нужный вариант и нажать его.
+    if testSex != "Мужской" && testSex != "Женский" {
+        LogEvent("F3: неподдерживаемое значение пола: " . testSex)
+        statusTextCtrl.Text :=
+            "⛔ ПОЛ НЕ ВЫБРАН`n`n" .
+            "Поддерживаются только Мужской / Женский."
+        return false
+    }
+
+    if !ocrAvailable {
+        LogEvent("F3: OCR недоступен — пол не выбран")
+        statusTextCtrl.Text :=
+            "⛔ ПОЛ НЕ ВЫБРАН`n`n" .
+            "OCR недоступен.`n" .
+            "Текстом пол не вводится."
+        return false
+    }
+
+    ; Запоминаем окно формы ДО скрытия наших панелей.
+    targetHwnd := WinExist("A")
+    if !targetHwnd {
+        LogEvent("F3: активное окно не найдено")
+        return false
+    }
+
+    overlayState := HideStatusForOcr()
+    controlWasVisible := controlVisible
+
+    if controlWasVisible {
+        controlGui.Hide()
+        Sleep(45)
+    }
+
+    found := ""
+    recognizedSample := ""
 
     try {
-        SendText(testSex)
+        ; Несколько проходов нужны для светлой/тёмной темы и браузеров
+        ; с аппаратным рендерингом. Никакого точного FindString(),
+        ; который раньше падал с "target string ... was not found".
+        passes := [
+            {scale:1.55, grayscale:true,  invertcolors:false, mode:4},
+            {scale:1.80, grayscale:true,  invertcolors:true,  mode:4},
+            {scale:2.00, grayscale:false, invertcolors:false, mode:4},
+            {scale:1.75, grayscale:true,  invertcolors:true,  mode:5}
+        ]
+
+        for pass in passes {
+            result := ""
+
+            try {
+                options := {
+                    lang: "ru-RU",
+                    scale: pass.scale,
+                    grayscale: pass.grayscale,
+                    invertcolors: pass.invertcolors,
+                    mode: pass.mode
+                }
+                result := OCR.FromWindow("ahk_id " . targetHwnd, options)
+            } catch {
+                ; Если русский OCR-пакет недоступен, пробуем системный язык.
+                try {
+                    options := {
+                        scale: pass.scale,
+                        grayscale: pass.grayscale,
+                        invertcolors: pass.invertcolors,
+                        mode: pass.mode
+                    }
+                    result := OCR.FromWindow("ahk_id " . targetHwnd, options)
+                } catch {
+                    continue
+                }
+            }
+
+            if !IsObject(result)
+                continue
+
+            if recognizedSample = "" {
+                try recognizedSample := SubStr(result.Text, 1, 220)
+            }
+
+            found := FindGenderCandidate(result, testSex)
+            if IsObject(found) {
+                ; Кликаем, пока наши окна ещё скрыты и не перекрывают форму.
+                found.Click()
+                Sleep(100)
+                break
+            }
+        }
     } finally {
-        ignoreKeyboardCapture := false
+        RestoreStatusAfterOcr(overlayState)
+
+        if controlWasVisible {
+            controlGui.Show("x540 y20 w410 h675 NoActivate")
+        }
     }
+
+    if IsObject(found) {
+        LogEvent("F3: OCR выбрал пол → " . testSex)
+        statusTextCtrl.Text :=
+            "✓ ПОЛ ВЫБРАН`n`n" .
+            "Профиль: " . testSex . "`n" .
+            "Нужный radio-вариант найден OCR и нажат."
+        return true
+    }
+
+    LogEvent("F3: OCR не нашёл вариант → " . testSex)
+    statusTextCtrl.Text :=
+        "⛔ ПОЛ НЕ ВЫБРАН`n`n" .
+        "Не удалось распознать: " . testSex . "`n" .
+        "Текстовый ввод отключён полностью."
+
+    if recognizedSample != ""
+        LogEvent("F3 OCR видел: " . StrReplace(recognizedSample, "`n", " | "))
 
     return false
 }
@@ -2706,59 +2851,6 @@ StartPlaybackFromGui(*) => PlayRecording()
 StopPlaybackFromGui(*) => StopPlayback()
 TypeSmartAnswerFromGui(*) => TypeSmartAnswer()
 NewProfileFromGui(*) => NewTestProfile()
-SaveRecordingFromGui(*) {
-    global recordingFile
-    SaveRecordingToFile(recordingFile, true)
-}
-
-SaveRecordingAsFromGui(*) {
-    global events, recording, playing
-    global statusTextCtrl
-
-    if recording || playing {
-        statusTextCtrl.Text :=
-            "⚠ НЕЛЬЗЯ СОХРАНИТЬ КАК`n`n" .
-            "Сначала остановите запись или воспроизведение."
-        return
-    }
-
-    if events.Length = 0 {
-        statusTextCtrl.Text :=
-            "⚠ НЕЧЕГО СОХРАНЯТЬ`n`n" .
-            "Сначала запишите или загрузите макрос."
-        return
-    }
-
-    selected := FileSelect(
-        "S16",
-        A_ScriptDir "\recordings\recording.srm",
-        "Сохранить запись как",
-        "Smart Recorder (*.srm)"
-    )
-
-    if selected = ""
-        return
-
-    if !RegExMatch(selected, "i)\.srm$")
-        selected .= ".srm"
-
-    if SaveRecordingToFile(selected, true) {
-        LogEvent(
-            "Сохранено как: " .
-            selected
-        )
-    }
-}
-
-LoadRecordingFromGui(*) {
-    global currentRecordingPath, recordingFile
-
-    ; Обычная кнопка загружает текущий выбранный файл.
-    ; Если другой файл ещё не выбирали — это last_recording.srm.
-    path := currentRecordingPath != "" ? currentRecordingPath : recordingFile
-    LoadRecordingFromFile(path, true)
-}
-
 LoadOtherRecordingFromGui(*) {
     global recording, playing
     global currentRecordingPath, currentRecordingName
@@ -2797,7 +2889,7 @@ LoadOtherRecordingFromGui(*) {
             "📂 ДРУГАЯ ЗАПИСЬ ЗАГРУЖЕНА`n`n" .
             "Файл: " . fileName . "`n`n" .
             "F9 теперь запускает именно эту запись.`n" .
-            "Для другой записи снова нажмите F12 → Загрузить другую..."
+            "Для другой записи снова нажмите F12 → Загрузить другую запись..."
     }
 }
 
@@ -3048,8 +3140,6 @@ GenerateTestProfile(showStatus:=true) {
             testSex := "Мужской"
         case "Женский":
             testSex := "Женский"
-        case "Другое":
-            testSex := "Другое"
         default:
             testSex := Random(0, 1) = 0 ? "Мужской" : "Женский"
     }
@@ -3460,7 +3550,7 @@ LoadRecordingFromFile(path, showStatus:=true) {
                         }
 
                         ; Новые записи содержат X; старые продолжают работать
-                        ; через обычный OCR-клик по тексту.
+                        ; старый X читается только для совместимости и больше не используется.
                         if (p.Length >= 3 && p[3] != "")
                             sexEvent.x := p[3] + 0
 
@@ -3590,7 +3680,7 @@ ToggleRecording() {
     SaveRecordingToFile(recordingFile, false)
 
     ShowRecordedStatus()
-    controlGui.Show("x540 y20 w410 h760 NoActivate")
+    controlGui.Show("x540 y20 w410 h675 NoActivate")
     controlVisible := true
 }
 
@@ -3961,8 +4051,8 @@ PlayRecording() {
                     "Профиль → пол " . testSex, true
                 )
 
-                sexAnchorX := event.HasOwnProp("x") ? event.x : ""
-                InsertCurrentProfileSex(sexAnchorX)
+                ; Старые записи могли хранить X, но теперь он намеренно игнорируется.
+                InsertCurrentProfileSex()
             }
         }
 
@@ -3994,7 +4084,7 @@ PlayRecording() {
 
     ReleaseAllPlaybackInputs()
     playing := false
-    controlGui.Show("x540 y20 w410 h760 NoActivate")
+    controlGui.Show("x540 y20 w410 h675 NoActivate")
     controlVisible := true
 
     if stopRequested
@@ -4237,7 +4327,18 @@ TypeSmartAnswer() {
         return
     }
 
-    ; Пользователь сам ставит курсор в нужное поле и нажимает F7.
+    ; Пол никогда не вводим текстом: F7 для вопроса о поле
+    ; использует тот же OCR-клик, что и F3.
+    if smartDetectedQuestion = "Пол" {
+        if InsertCurrentProfileSex()
+            smartLastError := "Пол выбран OCR: " . smartSuggestedAnswer
+        else
+            smartLastError := "Пол не выбран: нужный вариант OCR не найден"
+        ShowSmartStatus()
+        return
+    }
+
+    ; Для возраста/обычного текстового поля ручной ввод F7 сохраняется.
     SendText(smartSuggestedAnswer)
     smartLastError := "Введено: " . smartDetectedQuestion . " → " . smartSuggestedAnswer
     ShowSmartStatus()
@@ -4256,7 +4357,7 @@ ShowSmartStatus() {
     if smartDetectedQuestion != "" {
         text .= "Найден вопрос: " . smartDetectedQuestion . "`n"
         text .= "Подсказка: " . smartSuggestedAnswer . "`n"
-        text .= "`nПоставьте курсор в поле и нажмите F7."
+        text .= smartDetectedQuestion = "Пол" ? "`nF7 распознает и нажмёт нужный вариант пола." : "`nПоставьте курсор в поле и нажмите F7."
     } else {
         text .= "Вопрос возраст/пол не найден.`n"
     }
@@ -4462,7 +4563,7 @@ ToggleControlWindow() {
         controlGui.Hide()
         controlVisible := false
     } else {
-        controlGui.Show("x540 y20 w410 h760")
+        controlGui.Show("x540 y20 w410 h605")
         controlVisible := true
     }
 }

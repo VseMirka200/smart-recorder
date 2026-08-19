@@ -10,7 +10,7 @@ where powershell.exe >nul 2>nul
 if %errorlevel%==0 goto use_powershell
 
 echo ERROR: Neither curl.exe nor powershell.exe was found.
-echo Please download OCR.ahk manually from Descolada/OCR and place it next to SmartRecorder_TestMode.ahk.
+echo Please download OCR.ahk manually from Descolada/OCR and place it next to SmartRecorder.ahk.
 pause
 exit /b 1
 
@@ -26,7 +26,7 @@ goto check_file
 if exist "%~dp0OCR.ahk" (
     echo.
     echo OK: OCR.ahk was downloaded successfully.
-    echo You can now run SmartRecorder_TestMode.ahk.
+    echo You can now run SmartRecorder.ahk.
     pause
     exit /b 0
 )

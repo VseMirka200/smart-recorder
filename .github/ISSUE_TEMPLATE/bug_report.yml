@@ -1,0 +1,88 @@
+name: Сообщение об ошибке
+description: Сообщить о воспроизводимой проблеме в Smart Recorder
+title: "[Ошибка]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Спасибо за сообщение. Перед публикацией удалите персональные данные из логов и скриншотов.
+
+  - type: input
+    id: version
+    attributes:
+      label: Версия / commit SHA
+      description: Укажите commit SHA, дату версии или способ получения программы.
+      placeholder: Например, main @ abc1234
+    validations:
+      required: true
+
+  - type: dropdown
+    id: launch
+    attributes:
+      label: Способ запуска
+      options:
+        - SmartRecorder.ahk
+        - SmartRecorder.exe
+        - Другое
+    validations:
+      required: true
+
+  - type: input
+    id: windows
+    attributes:
+      label: Windows и масштаб экрана
+      placeholder: Windows 11, 1920x1080, масштаб 125%
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Описание проблемы
+      description: Что произошло?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Шаги воспроизведения
+      description: Перечислите минимальные шаги, после которых возникает ошибка.
+      placeholder: |
+        1. Запустить программу
+        2. Установить ...
+        3. Нажать ...
+        4. Ошибка возникает ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Ожидаемое поведение
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Фактическое поведение
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Журнал или текст ошибки
+      description: Вставьте только обезличенный фрагмент.
+      render: text
+
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Проверка данных
+      options:
+        - label: Я проверил вложения и удалил персональные/конфиденциальные данные.
+          required: true

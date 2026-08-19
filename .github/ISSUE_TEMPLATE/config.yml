@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Документация
+    url: https://github.com/VseMirka200/smart-recorder/blob/main/docs/README.md
+    about: Перед созданием Issue проверьте документацию, FAQ и руководство по устранению проблем.
+  - name: Поддержка и частые вопросы
+    url: https://github.com/VseMirka200/smart-recorder/blob/main/.github/SUPPORT.md
+    about: Рекомендации по диагностике и правильному оформлению сообщения об ошибке.
+  - name: Политика безопасности
+    url: https://github.com/VseMirka200/smart-recorder/blob/main/.github/SECURITY.md
+    about: Не публикуйте чувствительные сведения об уязвимостях в обычных Issues.

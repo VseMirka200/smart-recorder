@@ -1,0 +1,55 @@
+name: Предложение функции
+description: Предложить улучшение Smart Recorder
+title: "[Идея]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Опишите задачу пользователя и желаемое поведение. Старайтесь не привязывать предложение к одной конкретной реализации, если возможны более простые варианты.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Какая проблема решается?
+      description: Что сейчас неудобно или невозможно сделать?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Предлагаемое решение
+      description: Как должно выглядеть новое поведение?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Альтернативы
+      description: Какие другие варианты вы рассматривали?
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Область проекта
+      options:
+        - Интерфейс
+        - Запись
+        - Воспроизведение
+        - OCR
+        - Профиль
+        - Сохранение / загрузка
+        - Сборка
+        - Документация
+        - Другое
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Дополнительные детали
+      description: Макет, пример сценария, ограничения или другая полезная информация.

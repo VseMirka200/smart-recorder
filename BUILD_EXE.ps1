@@ -1,12 +1,13 @@
-$ErrorActionPreference = 'Stop'
+﻿$ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 $Root = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location $Root
 
-$Source = Join-Path $Root 'SmartRecorder_F4_PlaybackScreenshots_v27.ahk'
-$Output = Join-Path $Root 'SmartRecorder_F4_PlaybackScreenshots_v27.exe'
+$Source = Join-Path $Root 'SmartRecorder.ahk'
+$Output = Join-Path $Root 'SmartRecorder.exe'
 $OcrFile = Join-Path $Root 'OCR.ahk'
+$IconFile = Join-Path $Root 'SmartRecorder.ico'
 $Tools = Join-Path $Root '.buildtools'
 $AhkVersion = '2.0.26'
 $AhkZip = Join-Path $Tools "AutoHotkey_$AhkVersion.zip"
@@ -20,6 +21,9 @@ function Download-File([string]$Url, [string]$Destination) {
 
 if (-not (Test-Path $Source)) {
     throw "Source not found: $Source"
+}
+if (-not (Test-Path $IconFile)) {
+    throw "Icon not found: $IconFile"
 }
 
 New-Item -ItemType Directory -Force -Path $Tools | Out-Null
@@ -88,7 +92,7 @@ Remove-Item -Force $Output -ErrorAction SilentlyContinue
 
 Write-Host ''
 Write-Host 'Compiling SmartRecorder...'
-& $Compiler.FullName /in $Source /out $Output /base $Base.FullName
+& $Compiler.FullName /in $Source /out $Output /base $Base.FullName /icon $IconFile
 $ExitCode = $LASTEXITCODE
 
 if ($ExitCode -ne 0 -or -not (Test-Path $Output)) {
