@@ -1,0 +1,31 @@
+# Build outputs
+*.exe
+*.zip
+.buildtools/
+
+# Downloaded build dependency (BUILD_EXE.ps1 can restore it)
+/OCR.ahk
+
+# Runtime/user data — may contain sensitive input or screen content
+/recordings/*
+!/recordings/.gitkeep
+/screenshots/
+*.srm
+
+# Logs, dumps, temp files
+*.log
+*.tmp
+*.bak
+*.dmp
+~$*
+
+# Editor / OS
+.vscode/
+.idea/
+*.code-workspace
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# PowerShell local artifacts
+*.clixml
