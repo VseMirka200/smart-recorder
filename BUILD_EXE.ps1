@@ -13,10 +13,56 @@ $AhkVersion = '2.0.26'
 $AhkZip = Join-Path $Tools "AutoHotkey_$AhkVersion.zip"
 $AhkDir = Join-Path $Tools "AutoHotkey_$AhkVersion"
 $ExpectedAhkSha256 = '43522AA3122A57784AC5DB30ABF85C2244475C36ACD7796E2C993355F9E926AE'
+$AhkDownloadUrl = "https://github.com/AutoHotkey/AutoHotkey/releases/download/v$AhkVersion/AutoHotkey_$AhkVersion.zip"
 
 function Download-File([string]$Url, [string]$Destination) {
     Write-Host "Downloading: $Url"
-    Invoke-WebRequest -UseBasicParsing -Uri $Url -OutFile $Destination
+
+    $TempFile = "$Destination.download"
+    Remove-Item -Force $TempFile -ErrorAction SilentlyContinue
+
+    # curl.exe on Windows runners handles GitHub redirects and transient network
+    # errors more reliably than Windows PowerShell Invoke-WebRequest.
+    $Curl = Get-Command 'curl.exe' -ErrorAction SilentlyContinue
+    if ($Curl) {
+        & $Curl.Source `
+            --location `
+            --fail `
+            --silent `
+            --show-error `
+            --retry 5 `
+            --retry-delay 2 `
+            --connect-timeout 30 `
+            --user-agent 'SmartRecorder-Build' `
+            --output $TempFile `
+            $Url
+
+        if ($LASTEXITCODE -eq 0 -and (Test-Path $TempFile) -and ((Get-Item $TempFile).Length -gt 0)) {
+            Move-Item -Force $TempFile $Destination
+            return
+        }
+
+        Write-Warning 'curl.exe download failed; falling back to Invoke-WebRequest.'
+        Remove-Item -Force $TempFile -ErrorAction SilentlyContinue
+    }
+
+    $Headers = @{
+        'User-Agent' = 'SmartRecorder-Build'
+        'Accept' = 'application/octet-stream'
+    }
+
+    Invoke-WebRequest `
+        -UseBasicParsing `
+        -Uri $Url `
+        -OutFile $TempFile `
+        -Headers $Headers `
+        -MaximumRedirection 10
+
+    if (-not (Test-Path $TempFile) -or ((Get-Item $TempFile).Length -eq 0)) {
+        throw "Downloaded file is empty: $Url"
+    }
+
+    Move-Item -Force $TempFile $Destination
 }
 
 if (-not (Test-Path $Source)) {
@@ -34,8 +80,10 @@ if (-not (Test-Path $OcrFile)) {
 }
 
 # Pin the current stable AutoHotkey v2 toolchain for reproducible builds.
+# Download from the official GitHub Release rather than autohotkey.com so CI
+# does not receive an anti-bot HTML page instead of the ZIP archive.
 if (-not (Test-Path $AhkZip)) {
-    Download-File "https://www.autohotkey.com/download/2.0/AutoHotkey_$AhkVersion.zip" $AhkZip
+    Download-File $AhkDownloadUrl $AhkZip
 }
 
 $ActualSha = (Get-FileHash -Algorithm SHA256 $AhkZip).Hash.ToUpperInvariant()
@@ -95,12 +143,33 @@ Write-Host 'Compiling SmartRecorder...'
 & $Compiler.FullName /in $Source /out $Output /base $Base.FullName /icon $IconFile
 $ExitCode = $LASTEXITCODE
 
-if ($ExitCode -ne 0 -or -not (Test-Path $Output)) {
+# Ahk2Exe can return exit code 0 before the output file becomes visible to the
+# calling PowerShell process on CI. Treat a non-zero code as a real compiler
+# error, but give the successfully started compiler time to finish writing EXE.
+if ($ExitCode -ne 0) {
     throw "Ahk2Exe failed (exit code $ExitCode)."
+}
+
+$BuildDeadline = (Get-Date).AddSeconds(30)
+while ((Get-Date) -lt $BuildDeadline) {
+    if ((Test-Path $Output) -and ((Get-Item $Output).Length -gt 0)) {
+        break
+    }
+    Start-Sleep -Milliseconds 500
+}
+
+if (-not (Test-Path $Output)) {
+    throw 'Ahk2Exe returned success, but SmartRecorder.exe was not created within 30 seconds.'
+}
+
+$OutputInfo = Get-Item $Output
+if ($OutputInfo.Length -le 0) {
+    throw 'SmartRecorder.exe was created but is empty.'
 }
 
 $ExeHash = (Get-FileHash -Algorithm SHA256 $Output).Hash
 Write-Host ''
 Write-Host 'BUILD OK'
 Write-Host "EXE: $Output"
+Write-Host "SIZE: $($OutputInfo.Length) bytes"
 Write-Host "SHA256: $ExeHash"

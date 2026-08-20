@@ -5,14 +5,13 @@
 <h1 align="center">Умный рекордер</h1>
 
 <p align="center">
-  Настольная утилита на AutoHotkey v2 для записи и воспроизведения действий мыши и клавиатуры, повторения тестовых сценариев и автоматизации собственных форм.
+  Настольная утилита для записи и воспроизведения действий мыши и клавиатуры, повторения тестовых сценариев и автоматизации собственных форм.
 </p>
 
 <p align="center">
   <a href="https://github.com/VseMirka200/smart-recorder/archive/refs/heads/main.zip"><img alt="Скачать исходники" src="https://img.shields.io/badge/Скачать-исходники-2ea44f?style=for-the-badge&logo=github"></a>
   <a href="README_EN.md"><img alt="English" src="https://img.shields.io/badge/English-README-2563eb?style=for-the-badge"></a>
   <a href="docs/README.md"><img alt="Документация" src="https://img.shields.io/badge/Документация-открыть-6f42c1?style=for-the-badge"></a>
-  <a href="docs/DEVELOPMENT.md"><img alt="Сборка EXE" src="https://img.shields.io/badge/Сборка-EXE-0b7285?style=for-the-badge"></a>
   <a href="https://github.com/VseMirka200/smart-recorder/issues/new/choose"><img alt="Сообщить об ошибке" src="https://img.shields.io/badge/Сообщить-об%20ошибке-d73a49?style=for-the-badge&logo=github"></a>
 </p>
 
@@ -28,7 +27,7 @@
 
 **Умный рекордер** — настольная утилита для записи действий мыши и клавиатуры и их последующего воспроизведения с настраиваемой скоростью, количеством повторов и интервалами между ними.
 
-Программа также содержит генератор тестового профиля, OCR-помощник, журнал действий, отдельную панель состояния, автоматическое сохранение рабочей записи и сборщик Windows EXE.
+Программа также содержит генератор тестового профиля, OCR-помощник, журнал действий, отдельную панель состояния и автоматическое сохранение рабочей записи.
 
 Проект предназначен для автоматизации собственных и тестовых сценариев. Записи действий и снимки экрана могут содержать чувствительную информацию, поэтому runtime-данные необходимо проверять перед публикацией.
 
@@ -47,12 +46,9 @@
 - специальный сценарий `F4` для ответа и снимка области;
 - журнал действий;
 - отдельная панель состояния;
-- собственная иконка для окна, системного трея и собранного EXE;
-- сборка `SmartRecorder.exe` штатным PowerShell-скриптом.
+- собственная иконка приложения.
 
 ## Скачать
-
-### Исходники
 
 Самый простой вариант — нажать кнопку **«Скачать исходники»** в верхней части страницы. Будет загружен ZIP-архив текущей ветки `main`.
 
@@ -62,24 +58,12 @@
 git clone https://github.com/VseMirka200/smart-recorder.git
 ```
 
-### Готовый EXE
-
-В репозитории предусмотрена локальная сборка `SmartRecorder.exe`. После загрузки исходников запустите:
-
-```bat
-BUILD_EXE.bat
-```
-
-Подробности находятся в [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md).
-
 ## Быстрый старт
 
 1. Установите AutoHotkey v2, если запускаете исходный `.ahk` напрямую.
 2. Скачайте или клонируйте репозиторий.
 3. При необходимости запустите `Install_OCR.bat`.
-4. Запустите `SmartRecorder.ahk` либо соберите EXE через `BUILD_EXE.bat`.
-
-`BUILD_EXE.ps1` автоматически подготавливает AutoHotkey/Ahk2Exe, проверяет загружаемый архив AutoHotkey и собирает `SmartRecorder.exe` с иконкой `SmartRecorder.ico`.
+4. Запустите `SmartRecorder.ahk`.
 
 OCR-зависимость `OCR.ahk` при необходимости восстанавливается автоматически и не обязана храниться в чистом клоне репозитория.
 
@@ -130,20 +114,21 @@ OCR-зависимость `OCR.ahk` при необходимости восс�
 
 ## Структура репозитория
 
-Документация организована так, чтобы корень проекта оставался компактным:
-
 ```text
 SmartRecorder.ahk        основной код приложения
 SmartRecorder.ico        иконка Windows
 SmartRecorder.png        исходное изображение иконки
-BUILD_EXE.bat            быстрый запуск сборки
-BUILD_EXE.ps1            основной PowerShell-скрипт сборки
+BUILD_EXE.bat            локальный скрипт сборки
+BUILD_EXE.ps1            PowerShell-скрипт сборки
 Install_OCR.bat          ручная установка OCR-зависимости
 README.md                русская главная страница
 README_EN.md             английская главная страница
-CHANGELOG.md             история изменений
-docs/                    пользовательская и техническая документация
-.github/                 правила проекта, поддержка и шаблоны GitHub
+CHANGELOG.md             история изменений на русском
+CHANGELOG_EN.md          история изменений на английском
+docs/                    русская документация
+docs/en/                 английская документация
+.github/                 русские правила проекта и шаблоны GitHub
+.github/en/              английские версии правил проекта
 ```
 
 ## Runtime-данные
@@ -159,10 +144,9 @@ screenshots/
 
 ## Документация
 
-Единый индекс: **[`docs/README.md`](docs/README.md)**.
+Русский индекс: **[`docs/README.md`](docs/README.md)**.
 
 - [История изменений](CHANGELOG.md)
-- [Разработка и сборка](docs/DEVELOPMENT.md)
 - [Архитектура](docs/ARCHITECTURE.md)
 - [Горячие клавиши](docs/HOTKEYS.md)
 - [FAQ](docs/FAQ.md)
@@ -173,6 +157,8 @@ screenshots/
 - [Безопасность](.github/SECURITY.md)
 - [Правила сообщества](.github/CODE_OF_CONDUCT.md)
 
+Английские версии собраны отдельно в [`docs/en/README.md`](docs/en/README.md).
+
 ## Ошибки и предложения
 
 Для ошибок и новых идей используйте [GitHub Issues](https://github.com/VseMirka200/smart-recorder/issues/new/choose). В репозитории настроены отдельные шаблоны для сообщений об ошибке и предложений новых функций.
@@ -181,6 +167,6 @@ screenshots/
 
 ## Разработка
 
-Рекомендации по стилю, проверке и Pull Requests находятся в [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md) и [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md).
+Рекомендации по стилю и Pull Requests находятся в [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md).
 
 Если пользовательское поведение меняется, одновременно обновляйте соответствующую документацию и `CHANGELOG.md`.

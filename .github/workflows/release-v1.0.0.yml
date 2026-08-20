@@ -1,0 +1,123 @@
+name: Release v1.0.0
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/release-v1.0.0.yml'
+      - 'BUILD_EXE.ps1'
+      - 'SmartRecorder.ahk'
+      - 'SmartRecorder.ico'
+      - 'SmartRecorder.png'
+      - 'README.md'
+      - 'README_EN.md'
+      - 'docs/releases/v1.0.0.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-v1.0.0
+  cancel-in-progress: true
+
+jobs:
+  release:
+    runs-on: windows-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Smart Recorder
+        shell: pwsh
+        run: |
+          Set-ExecutionPolicy -Scope Process Bypass -Force
+          .\BUILD_EXE.ps1
+
+      - name: Prepare release assets
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $Version = 'v1.0.0'
+          $ReleaseDir = Join-Path $PWD 'release-package'
+
+          New-Item -ItemType Directory -Force -Path $ReleaseDir | Out-Null
+
+          Copy-Item '.\SmartRecorder.exe' ".\SmartRecorder-$Version.exe"
+          Copy-Item '.\SmartRecorder.exe' (Join-Path $ReleaseDir 'SmartRecorder.exe')
+          Copy-Item '.\SmartRecorder.ico' (Join-Path $ReleaseDir 'SmartRecorder.ico')
+          Copy-Item '.\SmartRecorder.png' (Join-Path $ReleaseDir 'SmartRecorder.png')
+          Copy-Item '.\README.md' (Join-Path $ReleaseDir 'README.md')
+          Copy-Item '.\README_EN.md' (Join-Path $ReleaseDir 'README_EN.md')
+          Copy-Item '.\LICENSE' (Join-Path $ReleaseDir 'LICENSE')
+
+          $LaunchNotes = @(
+            'Умный рекордер v1.0.0',
+            '',
+            'Портативная версия:',
+            '1. Запустите SmartRecorder.exe.',
+            '2. Установка AutoHotkey не требуется.',
+            '3. Рабочие записи создаются локально в каталоге recordings.',
+            '4. Скриншоты могут содержать чувствительные данные — проверяйте их перед публикацией.',
+            '',
+            'Документация находится в README.md.'
+          )
+          $LaunchNotes | Set-Content -Path (Join-Path $ReleaseDir 'ЗАПУСК.txt') -Encoding utf8
+
+          Compress-Archive -Path "$ReleaseDir\*" -DestinationPath ".\SmartRecorder-$Version-portable.zip" -Force
+
+          $Files = @(
+            ".\SmartRecorder-$Version.exe",
+            ".\SmartRecorder-$Version-portable.zip"
+          )
+
+          $Lines = foreach ($File in $Files) {
+            $Hash = (Get-FileHash -Algorithm SHA256 $File).Hash.ToLowerInvariant()
+            "$Hash  $([System.IO.Path]::GetFileName($File))"
+          }
+          $Lines | Set-Content '.\SHA256SUMS.txt' -Encoding ascii
+
+      - name: Create GitHub Release and upload assets
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $Repo = '${{ github.repository }}'
+          $Tag = 'v1.0.0'
+          $Title = 'Умный рекордер v1.0.0 — Первый стабильный релиз'
+          $Notes = '.\docs\releases\v1.0.0.md'
+
+          gh release view $Tag --repo $Repo *> $null
+          $ReleaseExists = ($LASTEXITCODE -eq 0)
+
+          if ($ReleaseExists) {
+            Write-Host 'Release v1.0.0 already exists; uploading assets with overwrite.'
+            gh release upload $Tag `
+              '.\SmartRecorder-v1.0.0.exe' `
+              '.\SmartRecorder-v1.0.0-portable.zip' `
+              '.\SHA256SUMS.txt' `
+              --clobber `
+              --repo $Repo
+
+            if ($LASTEXITCODE -ne 0) {
+              throw "Failed to upload assets to release $Tag."
+            }
+          }
+          else {
+            gh release create $Tag `
+              '.\SmartRecorder-v1.0.0.exe' `
+              '.\SmartRecorder-v1.0.0-portable.zip' `
+              '.\SHA256SUMS.txt' `
+              --title $Title `
+              --notes-file $Notes `
+              --target '${{ github.sha }}' `
+              --repo $Repo
+
+            if ($LASTEXITCODE -ne 0) {
+              throw "Failed to create release $Tag."
+            }
+          }

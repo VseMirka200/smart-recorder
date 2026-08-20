@@ -11,8 +11,7 @@
 <p align="center">
   <a href="https://github.com/VseMirka200/smart-recorder/archive/refs/heads/main.zip"><img alt="Download source" src="https://img.shields.io/badge/Download-source-2ea44f?style=for-the-badge&logo=github"></a>
   <a href="README.md"><img alt="Русский" src="https://img.shields.io/badge/Русский-README-2563eb?style=for-the-badge"></a>
-  <a href="docs/README.md"><img alt="Documentation" src="https://img.shields.io/badge/Documentation-open-6f42c1?style=for-the-badge"></a>
-  <a href="docs/DEVELOPMENT.md"><img alt="Build EXE" src="https://img.shields.io/badge/Build-EXE-0b7285?style=for-the-badge"></a>
+  <a href="docs/en/README.md"><img alt="Documentation" src="https://img.shields.io/badge/Documentation-open-6f42c1?style=for-the-badge"></a>
   <a href="https://github.com/VseMirka200/smart-recorder/issues/new/choose"><img alt="Report an issue" src="https://img.shields.io/badge/Report-an%20issue-d73a49?style=for-the-badge&logo=github"></a>
 </p>
 
@@ -22,11 +21,11 @@
   <img alt="Language" src="https://img.shields.io/badge/UI-Russian-informational">
 </p>
 
-> **Language:** English documentation is available on this page. The main interface of the current application is Russian. For the Russian README, see [README.md](README.md).
+> **Русский:** [Открыть русскую версию README](README.md).
 
 ## About
 
-Smart Recorder records mouse and keyboard actions and replays them with configurable speed, repetition count, and cooldown intervals. It also includes a test-profile generator, OCR-assisted actions, a status panel, an action journal, automatic recording persistence, and a Windows EXE build script.
+Smart Recorder records mouse and keyboard actions and replays them with configurable speed, repetition count, and cooldown intervals. It also includes a test-profile generator, OCR-assisted actions, a status panel, an action journal, and automatic recording persistence.
 
 The project is intended for automation of your own and test scenarios. Recorded input and screenshots may contain sensitive information, so runtime data should be reviewed before sharing.
 
@@ -44,31 +43,24 @@ The project is intended for automation of your own and test scenarios. Recorded 
 - `F3` workflow for selecting the required sex option;
 - `F4` special answer/screenshot workflow;
 - action journal and separate status panel;
-- custom application icon for the window, tray, and compiled EXE;
-- reproducible `SmartRecorder.exe` build through PowerShell scripts.
+- custom application icon.
+
+## Download
+
+Use the **Download source** button above to get a ZIP archive of the current `main` branch, or clone the repository:
+
+```bash
+git clone https://github.com/VseMirka200/smart-recorder.git
+```
 
 ## Quick start
 
-### Run from source
-
-1. Install AutoHotkey v2.
-2. Clone or [download the repository as ZIP](https://github.com/VseMirka200/smart-recorder/archive/refs/heads/main.zip).
-3. If OCR is required, run `Install_OCR.bat`.
+1. Install AutoHotkey v2 if you run the `.ahk` source directly.
+2. Clone or download the repository.
+3. Run `Install_OCR.bat` if OCR support is needed.
 4. Start `SmartRecorder.ahk`.
 
-### Build the EXE
-
-Run:
-
-```bat
-BUILD_EXE.bat
-```
-
-`BUILD_EXE.ps1` prepares AutoHotkey/Ahk2Exe, validates the downloaded AutoHotkey archive, and builds `SmartRecorder.exe` using `SmartRecorder.ico` as the application icon.
-
-See [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) for the full build and development guide.
-
-The `OCR.ahk` dependency can be restored automatically and does not need to be stored in a clean checkout.
+The `OCR.ahk` dependency can be restored when needed and does not have to be stored in a clean checkout.
 
 ## Hotkeys
 
@@ -88,7 +80,7 @@ The `OCR.ahk` dependency can be restored automatically and does not need to be s
 | `F12` | show or hide settings |
 | `Esc` | exit |
 
-See [`docs/HOTKEYS.md`](docs/HOTKEYS.md) for the detailed reference.
+Detailed reference: [`docs/en/HOTKEYS.md`](docs/en/HOTKEYS.md).
 
 ## Main settings
 
@@ -106,7 +98,7 @@ The application window provides controls for:
 
 ## Supported time formats
 
-Cooldown fields accept convenient values such as:
+Cooldown fields accept values such as:
 
 ```text
 3м
@@ -119,20 +111,21 @@ The current UI uses Russian abbreviations for minutes and seconds.
 
 ## Repository structure
 
-Documentation is grouped so the repository root stays compact:
-
 ```text
 SmartRecorder.ahk        main application code
 SmartRecorder.ico        Windows application icon
 SmartRecorder.png        source icon image
-BUILD_EXE.bat            quick build launcher
+BUILD_EXE.bat            local build helper
 BUILD_EXE.ps1            PowerShell build script
 Install_OCR.bat          manual OCR dependency installer
 README.md                Russian project overview
 README_EN.md             English project overview
-CHANGELOG.md             change history
-docs/                    user and technical documentation
-.github/                 project policies, support and GitHub templates
+CHANGELOG.md             Russian changelog
+CHANGELOG_EN.md          English changelog
+docs/                    Russian documentation
+docs/en/                 English documentation
+.github/                 Russian project policies and GitHub templates
+.github/en/              English policy translations
 ```
 
 ## Runtime data
@@ -148,22 +141,23 @@ These folders may contain user input or screen contents and should not be commit
 
 ## Documentation
 
-Central documentation index: **[`docs/README.md`](docs/README.md)**.
+English documentation index: **[`docs/en/README.md`](docs/en/README.md)**.
 
-- [Changelog](CHANGELOG.md)
-- [Development and build](docs/DEVELOPMENT.md)
-- [Architecture](docs/ARCHITECTURE.md)
-- [Hotkeys](docs/HOTKEYS.md)
-- [FAQ](docs/FAQ.md)
-- [Troubleshooting](docs/TROUBLESHOOTING.md)
-- [Roadmap](docs/ROADMAP.md)
-- [Contributing](.github/CONTRIBUTING.md)
-- [Support](.github/SUPPORT.md)
-- [Security](.github/SECURITY.md)
-- [Code of Conduct](.github/CODE_OF_CONDUCT.md)
+- [Changelog](CHANGELOG_EN.md)
+- [Architecture](docs/en/ARCHITECTURE.md)
+- [Hotkeys](docs/en/HOTKEYS.md)
+- [FAQ](docs/en/FAQ.md)
+- [Troubleshooting](docs/en/TROUBLESHOOTING.md)
+- [Roadmap](docs/en/ROADMAP.md)
+- [Contributing](.github/en/CONTRIBUTING.md)
+- [Support](.github/en/SUPPORT.md)
+- [Security](.github/en/SECURITY.md)
+- [Code of Conduct](.github/en/CODE_OF_CONDUCT.md)
+
+Russian documentation is available from [`docs/README.md`](docs/README.md).
 
 ## Issues and feature requests
 
-Use [GitHub Issues](https://github.com/VseMirka200/smart-recorder/issues/new/choose) for bug reports and feature requests. Dedicated templates are available for both.
+Use [GitHub Issues](https://github.com/VseMirka200/smart-recorder/issues/new/choose) for bug reports and feature requests.
 
 Before attaching screenshots, logs, or recordings, remove personal and confidential information.
