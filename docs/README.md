@@ -1,8 +1,6 @@
 # Документация Умного рекордера
 
-Этот каталог содержит русскую документацию проекта. Главная страница находится в [`README.md`](../README.md).
-
-> **English:** [Open the English documentation](en/README.md).
+Этот каталог содержит актуальную документацию проекта. Главная страница находится в [`README.md`](../README.md).
 
 ## Использование
 
@@ -28,7 +26,8 @@
 
 | Нужно | Документ |
 |---|---|
-| Запустить программу | [`README.md`](../README.md) |
+| Скачать программу | [Релиз 1.0.0](https://github.com/VseMirka200/smart-recorder/releases/tag/1.0.0) |
+| Запустить программу из исходников | [`README.md`](../README.md) |
 | Узнать горячую клавишу | [`HOTKEYS.md`](HOTKEYS.md) |
 | Решить проблему | [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md) |
 | Посмотреть архитектуру | [`ARCHITECTURE.md`](ARCHITECTURE.md) |

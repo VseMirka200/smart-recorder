@@ -9,27 +9,18 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/VseMirka200/smart-recorder/archive/refs/heads/main.zip"><img alt="Скачать исходники" src="https://img.shields.io/badge/Скачать-исходники-2ea44f?style=for-the-badge&logo=github"></a>
-  <a href="README_EN.md"><img alt="English" src="https://img.shields.io/badge/English-README-2563eb?style=for-the-badge"></a>
-  <a href="docs/README.md"><img alt="Документация" src="https://img.shields.io/badge/Документация-открыть-6f42c1?style=for-the-badge"></a>
-  <a href="https://github.com/VseMirka200/smart-recorder/issues/new/choose"><img alt="Сообщить об ошибке" src="https://img.shields.io/badge/Сообщить-об%20ошибке-d73a49?style=for-the-badge&logo=github"></a>
+  <a href="https://github.com/VseMirka200/smart-recorder/releases/download/1.0.0/SmartRecorder.exe"><img alt="Скачать" src="https://img.shields.io/badge/-СКАЧАТЬ-555555?style=for-the-badge&logo=github"></a>&nbsp;
+  <a href="docs/README.md"><img alt="Документация" src="https://img.shields.io/badge/-ДОКУМЕНТАЦИЯ-2468dc?style=for-the-badge"></a>&nbsp;
+  <a href="https://github.com/VseMirka200/smart-recorder/issues/new/choose"><img alt="Сообщить об ошибке" src="https://img.shields.io/badge/-ОШИБКА-dc3545?style=for-the-badge&logo=github"></a>
 </p>
-
-<p align="center">
-  <img alt="Windows" src="https://img.shields.io/badge/Windows-desktop-0078D4?logo=windows&logoColor=white">
-  <img alt="AutoHotkey v2" src="https://img.shields.io/badge/AutoHotkey-v2-334455">
-  <img alt="Язык интерфейса" src="https://img.shields.io/badge/Интерфейс-русский-informational">
-</p>
-
-> **English:** [Open the English README](README_EN.md).
 
 ## О программе
 
 **Умный рекордер** — настольная утилита для записи действий мыши и клавиатуры и их последующего воспроизведения с настраиваемой скоростью, количеством повторов и интервалами между ними.
 
-Программа также содержит генератор тестового профиля, OCR-помощник, журнал действий, отдельную панель состояния и автоматическое сохранение рабочей записи.
+Программа содержит генератор тестового профиля, OCR-помощник, журнал действий, отдельную панель состояния и автоматическое сохранение рабочей записи.
 
-Проект предназначен для автоматизации собственных и тестовых сценариев. Записи действий и снимки экрана могут содержать чувствительную информацию, поэтому runtime-данные необходимо проверять перед публикацией.
+Актуальная стабильная версия — **1.0.0**. Готовый `SmartRecorder.exe` доступен по кнопке **«СКАЧАТЬ»** выше.
 
 ## Возможности
 
@@ -42,25 +33,28 @@
 - генерация тестового профиля с возрастом и полом;
 - создание нового случайного профиля перед каждым повтором;
 - OCR-помощник для сценариев с распознаванием элементов формы;
-- сценарий `F3` для выбора нужного варианта пола;
-- специальный сценарий `F4` для ответа и снимка области;
+- специальные сценарии для выбора пола и ответа/снимка области;
 - журнал действий;
 - отдельная панель состояния;
-- собственная иконка приложения.
+- сборка в самостоятельный Windows EXE.
 
 ## Скачать
 
-Самый простой вариант — нажать кнопку **«Скачать исходники»** в верхней части страницы. Будет загружен ZIP-архив текущей ветки `main`.
+Рекомендуемый вариант — скачать готовый файл:
 
-Также можно клонировать репозиторий:
+**[SmartRecorder.exe — версия 1.0.0](https://github.com/VseMirka200/smart-recorder/releases/download/1.0.0/SmartRecorder.exe)**
+
+Исходный код можно клонировать:
 
 ```bash
 git clone https://github.com/VseMirka200/smart-recorder.git
 ```
 
-## Быстрый старт
+или скачать ZIP текущей ветки `main` на странице репозитория.
 
-1. Установите AutoHotkey v2, если запускаете исходный `.ahk` напрямую.
+## Быстрый старт из исходного кода
+
+1. Установите AutoHotkey v2.
 2. Скачайте или клонируйте репозиторий.
 3. При необходимости запустите `Install_OCR.bat`.
 4. Запустите `SmartRecorder.ahk`.
@@ -89,12 +83,11 @@ OCR-зависимость `OCR.ahk` при необходимости восс�
 
 ## Настройки
 
-В окне **Умного рекордера** доступны:
+В окне программы доступны:
 
 - количество повторов;
 - скорость воспроизведения;
 - диапазон кулдауна;
-- примеры поддерживаемого формата времени;
 - диапазон возраста;
 - режим пола;
 - создание нового профиля перед каждым повтором;
@@ -121,14 +114,10 @@ SmartRecorder.png        исходное изображение иконки
 BUILD_EXE.bat            локальный скрипт сборки
 BUILD_EXE.ps1            PowerShell-скрипт сборки
 Install_OCR.bat          ручная установка OCR-зависимости
-README.md                русская главная страница
-README_EN.md             английская главная страница
-CHANGELOG.md             история изменений на русском
-CHANGELOG_EN.md          история изменений на английском
-docs/                    русская документация
-docs/en/                 английская документация
-.github/                 русские правила проекта и шаблоны GitHub
-.github/en/              английские версии правил проекта
+README.md                главная страница проекта
+CHANGELOG.md             история изменений
+docs/                    документация
+.github/                 правила проекта и шаблоны GitHub
 ```
 
 ## Runtime-данные
@@ -144,8 +133,7 @@ screenshots/
 
 ## Документация
 
-Русский индекс: **[`docs/README.md`](docs/README.md)**.
-
+- [Индекс документации](docs/README.md)
 - [История изменений](CHANGELOG.md)
 - [Архитектура](docs/ARCHITECTURE.md)
 - [Горячие клавиши](docs/HOTKEYS.md)
@@ -157,16 +145,6 @@ screenshots/
 - [Безопасность](.github/SECURITY.md)
 - [Правила сообщества](.github/CODE_OF_CONDUCT.md)
 
-Английские версии собраны отдельно в [`docs/en/README.md`](docs/en/README.md).
-
 ## Ошибки и предложения
 
-Для ошибок и новых идей используйте [GitHub Issues](https://github.com/VseMirka200/smart-recorder/issues/new/choose). В репозитории настроены отдельные шаблоны для сообщений об ошибке и предложений новых функций.
-
-Перед публикацией скриншотов, логов или записей обязательно удалите персональные и конфиденциальные данные.
-
-## Разработка
-
-Рекомендации по стилю и Pull Requests находятся в [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md).
-
-Если пользовательское поведение меняется, одновременно обновляйте соответствующую документацию и `CHANGELOG.md`.
+Для ошибок и новых идей используйте [GitHub Issues](https://github.com/VseMirka200/smart-recorder/issues/new/choose). Перед публикацией скриншотов, логов или записей обязательно удалите персональные и конфиденциальные данные.
