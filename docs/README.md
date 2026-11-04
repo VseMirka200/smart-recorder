@@ -20,6 +20,7 @@
 - [`../.github/SUPPORT.md`](../.github/SUPPORT.md) — получение поддержки;
 - [`../.github/SECURITY.md`](../.github/SECURITY.md) — политика безопасности;
 - [`../.github/CODE_OF_CONDUCT.md`](../.github/CODE_OF_CONDUCT.md) — правила сообщества;
+- [vsemirka200@bk.ru](mailto:vsemirka200@bk.ru) — контакт для обратной связи;
 - [`releases/v1.0.0.md`](releases/v1.0.0.md) — заметки первого стабильного релиза.
 
 ## Быстрый переход
