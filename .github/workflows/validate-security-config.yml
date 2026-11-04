@@ -13,7 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      # Parse repository automation configuration before it is merged.
       - name: Validate workflow and Dependabot syntax
         run: |
           python -m pip install --disable-pip-version-check PyYAML==6.0.2
